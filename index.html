@@ -201,6 +201,14 @@
             border-color: #4a6cf7;
             background: white;
         }
+        .notice {
+            margin-top: 16px;
+            font-size: 0.75rem;
+            color: #999;
+            border-top: 1px solid #eee;
+            padding-top: 12px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -240,21 +248,18 @@
                placeholder="https://raw.githubusercontent.com/mihail245/ball/refs/heads/main/item.js">
         <button class="btn btn-outline btn-sm" id="applyUrlBtn" style="margin-top: 6px;">Применить URL</button>
     </div>
+
+    <div class="notice">⚠️ Данные НЕ сохраняются — всё сбрасывается при обновлении страницы</div>
 </div>
 
 <script>
     (function() {
         "use strict";
 
-        // --- Константы ---
-        const STORAGE_KEY_URL = 'itemsUrl';
         const DEFAULT_URL = 'https://raw.githubusercontent.com/mihail245/ball/refs/heads/main/item.js';
-
-        // --- Состояние ---
         let tasks = [];
         let itemsUrl = DEFAULT_URL;
 
-        // --- DOM элементы ---
         const taskListContainer = document.getElementById('taskListContainer');
         const taskCount = document.getElementById('taskCount');
         const taskNameInput = document.getElementById('taskNameInput');
@@ -267,7 +272,6 @@
         const itemsUrlInput = document.getElementById('itemsUrlInput');
         const applyUrlBtn = document.getElementById('applyUrlBtn');
 
-        // --- Вспомогательные ---
         function generateId() {
             return 'item_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
         }
@@ -307,7 +311,6 @@
             return div.innerHTML;
         }
 
-        // --- Загрузка из файла ---
         async function loadItemsFromUrl(url) {
             try {
                 setStatus('warning', '⏳ Загрузка...');
@@ -361,7 +364,6 @@
             }
         }
 
-        // --- Экспорт в item.js ---
         function exportItems() {
             if (tasks.length === 0) {
                 alert('Нет товаров для экспорта');
@@ -391,7 +393,6 @@
             setStatus('success', '📤 Экспортировано в item.js');
         }
 
-        // --- Действия ---
         function addTask(name, points) {
             const trimmed = name.trim();
             if (!trimmed) { alert('Введите название!'); return false; }
@@ -412,21 +413,10 @@
             render();
         }
 
-        // --- Инициализация ---
         async function init() {
-            // Загружаем URL из localStorage
-            const savedUrl = localStorage.getItem(STORAGE_KEY_URL);
-            if (savedUrl) {
-                itemsUrl = savedUrl;
-                itemsUrlInput.value = savedUrl;
-            } else {
-                itemsUrlInput.value = DEFAULT_URL;
-            }
+            itemsUrlInput.value = DEFAULT_URL;
+            await loadItemsFromUrl(DEFAULT_URL);
 
-            // Загружаем товары
-            await loadItemsFromUrl(itemsUrl);
-
-            // --- События ---
             addTaskBtn.addEventListener('click', () => {
                 addTask(taskNameInput.value, taskPointsInput.value);
                 taskNameInput.value = '';
@@ -447,16 +437,13 @@
                 const url = itemsUrlInput.value.trim();
                 if (url) {
                     itemsUrl = url;
-                    localStorage.setItem(STORAGE_KEY_URL, url);
                     loadItemsFromUrl(url);
                 } else {
                     itemsUrl = DEFAULT_URL;
-                    localStorage.removeItem(STORAGE_KEY_URL);
                     loadItemsFromUrl(DEFAULT_URL);
                 }
             });
 
-            // Делегирование для кнопок в списке
             taskListContainer.addEventListener('click', (e) => {
                 const btn = e.target.closest('button');
                 if (!btn) return;
