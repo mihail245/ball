@@ -3,71 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Калькулятор баллов и товаров</title>
+    <title>Калькулятор баллов</title>
     <style>
-        * {
-            box-sizing: border-box;
-            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-        }
+        * { box-sizing: border-box; font-family: system-ui, sans-serif; }
         body {
             margin: 0;
             min-height: 100vh;
-            background: #f6f9fc;
+            background: #f0f2f5;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 20px;
         }
-        .card {
-            max-width: 800px;
+        .container {
+            max-width: 700px;
             width: 100%;
             background: white;
-            border-radius: 32px;
-            padding: 30px 28px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.05), 0 5px 12px rgba(0,0,0,0.08);
-            transition: 0.2s;
-        }
-        h1 {
-            font-weight: 600;
-            font-size: 1.9rem;
-            letter-spacing: -0.5px;
-            color: #0b1b2e;
-            margin: 0 0 6px 0;
-        }
-        .subhead {
-            color: #4a5b6e;
-            margin-bottom: 28px;
-            border-left: 4px solid #6c8cff;
-            padding-left: 14px;
-            font-size: 1rem;
-            font-weight: 400;
-        }
-        .balance-panel {
-            background: #f0f4fe;
             border-radius: 24px;
-            padding: 18px 22px;
+            padding: 30px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+        }
+        h1 { margin: 0 0 5px 0; font-weight: 600; color: #1a1a2e; }
+        .sub { color: #666; margin-bottom: 25px; font-size: 0.95rem; }
+        
+        .balance-box {
+            background: #eef2ff;
+            border-radius: 16px;
+            padding: 16px 20px;
             display: flex;
-            align-items: center;
             justify-content: space-between;
+            align-items: center;
             flex-wrap: wrap;
-            gap: 15px 10px;
+            gap: 12px;
             margin-bottom: 30px;
         }
-        .balance-box {
-            display: flex;
-            align-items: baseline;
-            gap: 8px;
-        }
-        .balance-label {
-            font-weight: 500;
-            color: #1a2b3e;
-            font-size: 1.1rem;
-        }
-        .balance-value {
+        .balance {
+            font-size: 2rem;
             font-weight: 700;
-            font-size: 2.2rem;
-            color: #0033cc;
-            letter-spacing: -0.5px;
+            color: #4a6cf7;
         }
         .balance-controls {
             display: flex;
@@ -76,555 +49,343 @@
             flex-wrap: wrap;
         }
         .balance-controls input {
-            width: 90px;
-            padding: 10px 10px;
-            border: 1px solid #cfddee;
-            border-radius: 60px;
+            width: 80px;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
             font-size: 1rem;
-            font-weight: 500;
             text-align: center;
-            background: white;
-            outline: none;
-            transition: 0.15s;
-        }
-        .balance-controls input:focus {
-            border-color: #6c8cff;
-            box-shadow: 0 0 0 3px rgba(108, 140, 255, 0.25);
         }
         .btn {
+            padding: 8px 16px;
             border: none;
-            background: white;
-            padding: 10px 18px;
-            border-radius: 60px;
+            border-radius: 8px;
             font-weight: 500;
-            font-size: 0.95rem;
-            color: #1a2b3e;
             cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
             transition: 0.15s;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
-            border: 1px solid transparent;
+            font-size: 0.9rem;
         }
         .btn-primary {
-            background: #0033cc;
+            background: #4a6cf7;
             color: white;
-            box-shadow: 0 4px 10px rgba(0, 51, 204, 0.2);
         }
-        .btn-primary:hover {
-            background: #002699;
-            transform: scale(0.97);
-        }
+        .btn-primary:hover { background: #3a56d4; }
         .btn-outline {
-            background: transparent;
-            border: 1px solid #cfddee;
+            background: white;
+            border: 1px solid #ddd;
         }
-        .btn-outline:hover {
-            background: #eaf0fa;
-            border-color: #b0c6e0;
+        .btn-outline:hover { background: #f5f5f5; }
+        .btn-danger {
+            background: #ff4757;
+            color: white;
         }
-        .btn-danger-outline {
-            border: 1px solid #ffd9d9;
-            color: #b33c3c;
-        }
-        .btn-danger-outline:hover {
-            background: #ffe6e6;
-        }
-        .btn-success-outline {
-            border: 1px solid #b8e0c7;
-            color: #1f6e3f;
-        }
-        .btn-success-outline:hover {
-            background: #e1f5e9;
-        }
+        .btn-danger:hover { background: #e63946; }
+        .btn-sm { padding: 4px 10px; font-size: 0.8rem; }
+
         .section-title {
             font-weight: 600;
-            font-size: 1.2rem;
-            color: #0b1b2e;
-            margin: 25px 0 15px 0;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            font-size: 1.1rem;
+            margin: 25px 0 12px 0;
         }
+
         .task-list {
             list-style: none;
             padding: 0;
             margin: 0 0 20px 0;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
         }
         .task-item {
-            background: #fafcff;
-            border-radius: 18px;
-            padding: 14px 18px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border: 1px solid #e3ecf7;
-            transition: 0.1s;
+            padding: 12px 16px;
+            background: #fafafa;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            border: 1px solid #eee;
         }
-        .task-item:hover {
-            background: #ffffff;
-            border-color: #c8d9f0;
-        }
-        .task-info {
-            display: flex;
-            align-items: baseline;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-        .task-name {
-            font-weight: 500;
-            font-size: 1rem;
-            color: #162b44;
-        }
+        .task-item:hover { background: #f5f7ff; }
+        .task-name { font-weight: 500; }
         .task-points {
-            background: #e9effa;
-            border-radius: 40px;
-            padding: 4px 14px;
+            background: #e8ecf1;
+            padding: 2px 14px;
+            border-radius: 20px;
             font-size: 0.85rem;
             font-weight: 600;
-            color: #0033cc;
+            color: #4a6cf7;
         }
-        .task-actions {
+        .task-actions { display: flex; gap: 6px; }
+
+        .add-area {
             display: flex;
-            gap: 6px;
-        }
-        .task-actions .btn {
-            padding: 6px 12px;
-            font-size: 0.85rem;
-        }
-        .empty-message {
-            text-align: center;
-            color: #7a8b9e;
-            padding: 20px 0;
-            font-style: italic;
-        }
-        .add-task-area {
-            background: #f4f8ff;
-            border-radius: 60px;
-            padding: 12px 18px;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
             gap: 10px;
-            margin: 20px 0 5px;
-            border: 1px solid #dce6f2;
+            flex-wrap: wrap;
+            margin: 15px 0 10px 0;
         }
-        .add-task-area input {
-            flex: 1 1 140px;
-            border: none;
-            background: transparent;
-            padding: 10px 6px;
+        .add-area input {
+            flex: 1;
+            padding: 10px 14px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
             font-size: 0.95rem;
-            outline: none;
-            border-bottom: 2px solid transparent;
-            transition: 0.1s;
-            min-width: 100px;
+            min-width: 120px;
         }
-        .add-task-area input:focus {
-            border-bottom-color: #6c8cff;
-        }
-        .add-task-area input::placeholder {
-            color: #8b9db3;
-        }
-        .add-task-area .btn {
-            border-radius: 40px;
-            background: #0033cc;
-            color: white;
-            padding: 8px 20px;
-            font-weight: 500;
-        }
-        .add-task-area .btn:hover {
-            background: #002699;
-        }
-        .footer-hint {
-            margin-top: 30px;
-            font-size: 0.8rem;
-            color: #7a8fa8;
+        .add-area input:focus { outline: none; border-color: #4a6cf7; }
+
+        .empty {
             text-align: center;
-            border-top: 1px solid #e3ecf7;
-            padding-top: 20px;
+            color: #999;
+            padding: 30px 0;
         }
-        .footer-hint code {
-            background: #eef3fa;
-            padding: 3px 10px;
-            border-radius: 30px;
-            font-size: 0.75rem;
+
+        .footer {
+            margin-top: 25px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+            font-size: 0.8rem;
+            color: #888;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 8px;
         }
-        .badge {
-            background: #dce6f2;
-            border-radius: 40px;
-            padding: 0 12px;
-            font-size: 0.75rem;
-            color: #1f3a5a;
-            line-height: 26px;
-        }
-        @media (max-width: 550px) {
-            .card { padding: 20px 15px; }
-            .balance-panel { flex-direction: column; align-items: stretch; }
-            .balance-controls { justify-content: stretch; }
-            .balance-controls input { flex: 1; }
-            .task-item { flex-wrap: wrap; gap: 10px; }
+        code {
+            background: #f0f0f0;
+            padding: 2px 10px;
+            border-radius: 6px;
+            font-size: 0.8rem;
         }
     </style>
 </head>
 <body>
+<div class="container">
+    <h1>🎯 Баллы</h1>
+    <div class="sub">Управление баллами и товарами</div>
 
-<div class="card">
-    <h1>🎯 Баллы · Товары</h1>
-    <div class="subhead">Управляйте балансом и добавляйте товары в список задач</div>
-
-    <!-- Панель баланса -->
-    <div class="balance-panel">
-        <div class="balance-box">
-            <span class="balance-label">💰 Баланс</span>
-            <span class="balance-value" id="balanceDisplay">0</span>
-        </div>
+    <!-- Баланс -->
+    <div class="balance-box">
+        <span style="font-weight: 500;">💰 Баланс</span>
+        <span class="balance" id="balanceDisplay">0</span>
         <div class="balance-controls">
-            <input type="number" id="pointsInput" value="10" min="1" step="1">
-            <button class="btn btn-primary" id="addPointsBtn">➕ Добавить</button>
-            <button class="btn btn-outline" id="resetBalanceBtn">↺ Сброс</button>
+            <input type="number" id="pointsInput" value="10" min="1">
+            <button class="btn btn-primary" id="addPointsBtn">+</button>
+            <button class="btn btn-outline" id="resetBalanceBtn">Сброс</button>
         </div>
     </div>
 
-    <!-- Список товаров (задач) -->
-    <div class="section-title">
-        <span>📋 Список товаров</span>
-        <span class="badge" id="taskCount">0</span>
-    </div>
-
+    <!-- Список товаров -->
+    <div class="section-title">📦 Товары (<span id="taskCount">0</span>)</div>
     <ul class="task-list" id="taskListContainer">
-        <li class="empty-message">Нет товаров. Добавьте первый!</li>
+        <li class="empty">Нет товаров. Добавьте первый!</li>
     </ul>
 
-    <!-- Форма добавления нового товара -->
-    <div class="add-task-area">
-        <input type="text" id="taskNameInput" placeholder="Название товара" value="Ноутбук">
-        <input type="number" id="taskPointsInput" value="25" min="1" step="1" style="max-width: 100px; width: 80px;">
-        <button class="btn" id="addTaskBtn">➕ Добавить товар</button>
+    <!-- Добавление товара -->
+    <div class="add-area">
+        <input type="text" id="taskNameInput" placeholder="Название товара">
+        <input type="number" id="taskPointsInput" value="10" min="1" style="max-width: 100px;">
+        <button class="btn btn-primary" id="addTaskBtn">➕ Добавить</button>
     </div>
 
-    <!-- Действия с товарами (удалить все) -->
-    <div style="display: flex; justify-content: flex-end; margin-top: 12px; gap: 8px;">
-        <button class="btn btn-danger-outline" id="clearAllTasksBtn">🗑 Очистить все</button>
-        <button class="btn btn-success-outline" id="resetDefaultTasksBtn">↺ Сбросить пример</button>
+    <!-- Кнопки управления -->
+    <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px;">
+        <button class="btn btn-outline btn-sm" id="clearAllBtn">🗑 Очистить всё</button>
+        <button class="btn btn-outline btn-sm" id="addExampleBtn">📋 Добавить пример</button>
     </div>
 
-    <div class="footer-hint">
-        <code>📁 tasks</code> · Данные сохраняются в <strong>localStorage</strong> · GitHub Pages ready
+    <div class="footer">
+        <span>📁 Данные в <code>localStorage</code></span>
+        <span>GitHub Pages ready</span>
     </div>
 </div>
 
 <script>
-    (function() {
-        "use strict";
+(function() {
+    // --- Константы ---
+    const STORAGE_KEY_BALANCE = 'myBalance';
+    const STORAGE_KEY_TASKS = 'myTasks';
 
-        // --- Элементы DOM ---
-        const balanceDisplay = document.getElementById('balanceDisplay');
-        const pointsInput = document.getElementById('pointsInput');
-        const addPointsBtn = document.getElementById('addPointsBtn');
-        const resetBalanceBtn = document.getElementById('resetBalanceBtn');
+    // --- Состояние ---
+    let balance = parseInt(localStorage.getItem(STORAGE_KEY_BALANCE)) || 0;
+    let tasks = JSON.parse(localStorage.getItem(STORAGE_KEY_TASKS)) || [];
 
-        const taskListContainer = document.getElementById('taskListContainer');
-        const taskCount = document.getElementById('taskCount');
+    // --- DOM элементы ---
+    const balanceDisplay = document.getElementById('balanceDisplay');
+    const pointsInput = document.getElementById('pointsInput');
+    const addPointsBtn = document.getElementById('addPointsBtn');
+    const resetBalanceBtn = document.getElementById('resetBalanceBtn');
+    const taskListContainer = document.getElementById('taskListContainer');
+    const taskCount = document.getElementById('taskCount');
+    const taskNameInput = document.getElementById('taskNameInput');
+    const taskPointsInput = document.getElementById('taskPointsInput');
+    const addTaskBtn = document.getElementById('addTaskBtn');
+    const clearAllBtn = document.getElementById('clearAllBtn');
+    const addExampleBtn = document.getElementById('addExampleBtn');
 
-        const taskNameInput = document.getElementById('taskNameInput');
-        const taskPointsInput = document.getElementById('taskPointsInput');
-        const addTaskBtn = document.getElementById('addTaskBtn');
+    // --- Вспомогательные ---
+    function generateId() {
+        return Date.now() + '_' + Math.random().toString(36).slice(2, 8);
+    }
 
-        const clearAllTasksBtn = document.getElementById('clearAllTasksBtn');
-        const resetDefaultTasksBtn = document.getElementById('resetDefaultTasksBtn');
+    function save() {
+        localStorage.setItem(STORAGE_KEY_BALANCE, String(balance));
+        localStorage.setItem(STORAGE_KEY_TASKS, JSON.stringify(tasks));
+    }
 
-        // --- Ключи localStorage ---
-        const STORAGE_KEY_BALANCE = 'pointsBalance';
-        const STORAGE_KEY_TASKS = 'tasksList';
+    function render() {
+        // Баланс
+        balanceDisplay.textContent = balance;
 
-        // --- Состояние ---
-        let balance = 0;
-        let tasks = []; // массив объектов { id, name, points }
-
-        // --- Вспомогательные функции ---
-        function generateId() {
-            return Date.now() + '_' + Math.random().toString(36).slice(2, 7);
-        }
-
-        // --- Загрузка из localStorage ---
-        function loadState() {
-            // Баланс
-            const savedBalance = localStorage.getItem(STORAGE_KEY_BALANCE);
-            if (savedBalance !== null) {
-                const parsed = parseInt(savedBalance, 10);
-                if (!isNaN(parsed) && parsed >= 0) {
-                    balance = parsed;
-                } else {
-                    balance = 0;
-                }
-            } else {
-                // начальный баланс по умолчанию
-                balance = 120;
-            }
-
-            // Товары
-            const savedTasks = localStorage.getItem(STORAGE_KEY_TASKS);
-            if (savedTasks) {
-                try {
-                    const parsedTasks = JSON.parse(savedTasks);
-                    if (Array.isArray(parsedTasks) && parsedTasks.every(item => item && typeof item === 'object' && 'id' in item && 'name' in item && 'points' in item)) {
-                        tasks = parsedTasks;
-                    } else {
-                        tasks = getDefaultTasks();
-                    }
-                } catch (e) {
-                    tasks = getDefaultTasks();
-                }
-            } else {
-                tasks = getDefaultTasks();
-            }
-
-            // если баланс отрицательный или не число — сброс
-            if (isNaN(balance) || balance < 0) balance = 0;
-
-            // проверка на дубликаты id (на всякий случай)
-            const ids = new Set();
-            tasks = tasks.filter(task => {
-                if (!task.id || ids.has(task.id)) return false;
-                ids.add(task.id);
-                return true;
+        // Список
+        if (tasks.length === 0) {
+            taskListContainer.innerHTML = '<li class="empty">Нет товаров. Добавьте первый!</li>';
+            taskCount.textContent = '0';
+        } else {
+            let html = '';
+            tasks.forEach(task => {
+                html += `
+                    <li class="task-item" data-id="${task.id}">
+                        <div>
+                            <span class="task-name">${escapeHtml(task.name)}</span>
+                            <span class="task-points">${task.points} баллов</span>
+                        </div>
+                        <div class="task-actions">
+                            <button class="btn btn-outline btn-sm btn-dec" data-id="${task.id}">−5</button>
+                            <button class="btn btn-outline btn-sm btn-inc" data-id="${task.id}">+5</button>
+                            <button class="btn btn-danger btn-sm btn-del" data-id="${task.id}">✕</button>
+                        </div>
+                    </li>
+                `;
             });
+            taskListContainer.innerHTML = html;
+            taskCount.textContent = tasks.length;
         }
 
-        // --- Задачи по умолчанию ---
-        function getDefaultTasks() {
-            return [
-                { id: generateId(), name: 'Наушники Sony', points: 45 },
-                { id: generateId(), name: 'Клавиатура MX', points: 30 },
-                { id: generateId(), name: 'Мышь Logitech', points: 20 },
-            ];
-        }
+        save();
+    }
 
-        // --- Сохранение в localStorage ---
-        function saveState() {
-            localStorage.setItem(STORAGE_KEY_BALANCE, String(balance));
-            localStorage.setItem(STORAGE_KEY_TASKS, JSON.stringify(tasks));
-        }
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
 
-        // --- Отрисовка ---
-        function render() {
-            // Баланс
-            balanceDisplay.textContent = balance;
+    // --- Действия ---
+    function updateBalance(newBalance) {
+        balance = Math.max(0, Math.floor(newBalance));
+        render();
+    }
 
-            // Список задач
-            if (tasks.length === 0) {
-                taskListContainer.innerHTML = `<li class="empty-message">✨ Нет товаров. Добавьте первый!</li>`;
-                taskCount.textContent = '0';
-            } else {
-                let html = '';
-                tasks.forEach(task => {
-                    html += `
-                        <li class="task-item" data-id="${task.id}">
-                            <div class="task-info">
-                                <span class="task-name">${escapeHtml(task.name)}</span>
-                                <span class="task-points">${task.points} баллов</span>
-                            </div>
-                            <div class="task-actions">
-                                <button class="btn btn-outline btn-decrease-points" data-id="${task.id}" style="padding: 4px 10px;">−</button>
-                                <button class="btn btn-outline btn-increase-points" data-id="${task.id}" style="padding: 4px 10px;">+</button>
-                                <button class="btn btn-danger-outline btn-remove-task" data-id="${task.id}" style="padding: 4px 10px;">✕</button>
-                            </div>
-                        </li>
-                    `;
-                });
-                taskListContainer.innerHTML = html;
-                taskCount.textContent = tasks.length;
-            }
+    function addTask(name, points) {
+        const trimmed = name.trim();
+        if (!trimmed) { alert('Введите название!'); return false; }
+        const pts = parseInt(points);
+        if (isNaN(pts) || pts < 1) { alert('Баллы должны быть > 0'); return false; }
 
-            // Сохраняем состояние после отрисовки
-            saveState();
-        }
+        tasks.push({
+            id: generateId(),
+            name: trimmed,
+            points: pts
+        });
+        render();
+        return true;
+    }
 
-        // Простейший escape для защиты от XSS
-        function escapeHtml(text) {
-            if (!text) return '';
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
+    function removeTask(id) {
+        tasks = tasks.filter(t => t.id !== id);
+        render();
+    }
 
-        // --- Обновление баланса с проверкой ---
-        function updateBalance(newBalance) {
-            if (typeof newBalance !== 'number' || isNaN(newBalance) || newBalance < 0) {
-                newBalance = 0;
-            }
-            balance = Math.floor(newBalance); // целое
-            render();
-        }
+    function changeTaskPoints(id, delta) {
+        const task = tasks.find(t => t.id === id);
+        if (!task) return;
+        const newPoints = task.points + delta;
+        if (newPoints < 1) { alert('Минимум 1 балл'); return; }
+        task.points = newPoints;
+        render();
+    }
 
-        // --- Добавление товара ---
-        function addTask(name, points) {
-            const trimmedName = name.trim();
-            if (!trimmedName) {
-                alert('Введите название товара.');
-                return false;
-            }
-            const pointsNum = parseInt(points, 10);
-            if (isNaN(pointsNum) || pointsNum <= 0) {
-                alert('Количество баллов должно быть положительным числом.');
-                return false;
-            }
-            // проверка дубликата имени (необязательно, но полезно)
-            // if (tasks.some(t => t.name.toLowerCase() === trimmedName.toLowerCase())) {
-            //     if (!confirm(`Товар "${trimmedName}" уже существует. Добавить дубликат?`)) return false;
-            // }
-
-            const newTask = {
-                id: generateId(),
-                name: trimmedName,
-                points: pointsNum
-            };
-            tasks.push(newTask);
-            render();
-            return true;
-        }
-
-        // --- Удаление товара по id ---
-        function removeTaskById(id) {
-            tasks = tasks.filter(task => task.id !== id);
-            render();
-        }
-
-        // --- Изменить баллы товара ---
-        function changeTaskPoints(id, delta) {
-            const task = tasks.find(t => t.id === id);
-            if (!task) return;
-            const newPoints = task.points + delta;
-            if (newPoints < 1) {
-                alert('Баллы товара не могут быть меньше 1.');
-                return;
-            }
-            task.points = newPoints;
-            render();
-        }
-
-        // --- Сброс к задачам по умолчанию (с сохранением баланса) ---
-        function resetToDefaultTasks() {
-            if (tasks.length > 0) {
-                if (!confirm('Заменить текущий список товаров на пример?')) return;
-            }
-            tasks = getDefaultTasks();
-            render();
-        }
-
-        // --- Очистить все задачи ---
-        function clearAllTasks() {
-            if (tasks.length === 0) return;
-            if (!confirm('Удалить все товары из списка?')) return;
+    function clearAll() {
+        if (tasks.length === 0) return;
+        if (confirm('Удалить все товары?')) {
             tasks = [];
             render();
         }
+    }
 
-        // --- Инициализация ---
-        function init() {
-            loadState();
-            render();
-
-            // --- Обработчики событий ---
-
-            // Добавление баллов
-            addPointsBtn.addEventListener('click', function() {
-                const val = parseInt(pointsInput.value, 10);
-                if (isNaN(val) || val <= 0) {
-                    alert('Введите положительное число баллов.');
-                    return;
-                }
-                updateBalance(balance + val);
-                pointsInput.value = '';
-                pointsInput.placeholder = 'количество';
-                setTimeout(() => { pointsInput.placeholder = '10'; }, 1500);
+    function addExample() {
+        const examples = [
+            { name: 'Наушники', points: 30 },
+            { name: 'Клавиатура', points: 25 },
+            { name: 'Мышь', points: 15 }
+        ];
+        examples.forEach(ex => {
+            tasks.push({
+                id: generateId(),
+                name: ex.name,
+                points: ex.points
             });
+        });
+        render();
+    }
 
-            // Сброс баланса
-            resetBalanceBtn.addEventListener('click', function() {
-                if (balance === 0) return;
-                if (confirm('Сбросить баланс до 0?')) {
-                    updateBalance(0);
-                }
-            });
+    // --- Инициализация ---
+    function init() {
+        // Если tasks пустые, но в localStorage нет — оставляем пустыми (максимально пусто)
+        render();
 
-            // Добавление товара
-            addTaskBtn.addEventListener('click', function() {
-                const name = taskNameInput.value;
-                const points = taskPointsInput.value;
-                if (addTask(name, points)) {
-                    taskNameInput.value = '';
-                    taskPointsInput.value = '25';
-                    taskNameInput.focus();
-                }
-            });
+        // --- События ---
+        addPointsBtn.addEventListener('click', () => {
+            const val = parseInt(pointsInput.value);
+            if (isNaN(val) || val < 1) { alert('Введите положительное число'); return; }
+            updateBalance(balance + val);
+        });
 
-            // Enter в полях добавления
-            taskNameInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    addTaskBtn.click();
-                }
-            });
-            taskPointsInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    addTaskBtn.click();
-                }
-            });
+        resetBalanceBtn.addEventListener('click', () => {
+            if (balance === 0) return;
+            if (confirm('Сбросить баланс до 0?')) updateBalance(0);
+        });
 
-            // Очистить все задачи
-            clearAllTasksBtn.addEventListener('click', clearAllTasks);
+        addTaskBtn.addEventListener('click', () => {
+            addTask(taskNameInput.value, taskPointsInput.value);
+            taskNameInput.value = '';
+            taskPointsInput.value = '10';
+            taskNameInput.focus();
+        });
 
-            // Сброс к примеру
-            resetDefaultTasksBtn.addEventListener('click', resetToDefaultTasks);
+        // Enter
+        taskNameInput.addEventListener('keypress', e => { if (e.key === 'Enter') addTaskBtn.click(); });
+        taskPointsInput.addEventListener('keypress', e => { if (e.key === 'Enter') addTaskBtn.click(); });
+        pointsInput.addEventListener('keypress', e => { if (e.key === 'Enter') addPointsBtn.click(); });
 
-            // Делегирование событий для кнопок внутри списка
-            taskListContainer.addEventListener('click', function(e) {
-                const target = e.target.closest('button');
-                if (!target) return;
+        clearAllBtn.addEventListener('click', clearAll);
+        addExampleBtn.addEventListener('click', addExample);
 
-                const taskId = target.dataset.id;
-                if (!taskId) return;
+        // Делегирование для кнопок в списке
+        taskListContainer.addEventListener('click', (e) => {
+            const btn = e.target.closest('button');
+            if (!btn) return;
+            const id = btn.dataset.id;
+            if (!id) return;
 
-                // Удаление
-                if (target.classList.contains('btn-remove-task')) {
-                    const task = tasks.find(t => t.id === taskId);
-                    if (task && confirm(`Удалить товар "${task.name}"?`)) {
-                        removeTaskById(taskId);
-                    }
-                    return;
-                }
+            if (btn.classList.contains('btn-del')) {
+                const task = tasks.find(t => t.id === id);
+                if (task && confirm(`Удалить "${task.name}"?`)) removeTask(id);
+                return;
+            }
 
-                // Увеличение/уменьшение баллов товара
-                if (target.classList.contains('btn-increase-points')) {
-                    changeTaskPoints(taskId, 5);
-                    return;
-                }
-                if (target.classList.contains('btn-decrease-points')) {
-                    changeTaskPoints(taskId, -5);
-                    return;
-                }
-            });
+            if (btn.classList.contains('btn-inc')) {
+                changeTaskPoints(id, 5);
+                return;
+            }
 
-            // Быстрое изменение баланса с клавиатуры (Enter в поле ввода)
-            pointsInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    addPointsBtn.click();
-                }
-            });
-        }
+            if (btn.classList.contains('btn-dec')) {
+                changeTaskPoints(id, -5);
+                return;
+            }
+        });
+    }
 
-        // Старт
-        init();
-    })();
+    init();
+})();
 </script>
 </body>
 </html>
