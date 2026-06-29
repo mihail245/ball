@@ -290,7 +290,7 @@
         <button class="btn btn-outline btn-sm" id="clearAllBtn">🗑 Очистить всё</button>
         <button class="btn btn-success btn-sm" id="exportBtn">📤 Экспорт в item.js</button>
         <button class="btn btn-warning btn-sm" id="reloadBtn">🔄 Перезагрузить</button>
-        <button class="btn btn-outline btn-sm" id="resetDefaultBtn">📋 Загрузить пример</button>
+        <button class="btn btn-danger btn-sm" id="clearStorageBtn">🧹 Очистить localStorage</button>
     </div>
 
     <!-- Настройка URL для загрузки -->
@@ -302,7 +302,7 @@
     </div>
 
     <div class="footer">
-        <span>📁 Данные хранятся в <code>localStorage</code></span>
+        <span>📁 Данные НЕ сохраняются в localStorage</span>
         <span>🌐 GitHub Pages ready</span>
     </div>
 </div>
@@ -318,9 +318,9 @@
         const DEFAULT_URL = 'https://raw.githubusercontent.com/mihail245/ball/refs/heads/main/item.js';
 
         // --- Состояние ---
-        let balance = parseInt(localStorage.getItem(STORAGE_KEY_BALANCE)) || 0;
+        let balance = 0;
         let tasks = [];
-        let itemsUrl = localStorage.getItem(STORAGE_KEY_URL) || DEFAULT_URL;
+        let itemsUrl = DEFAULT_URL;
 
         // --- DOM элементы ---
         const balanceDisplay = document.getElementById('balanceDisplay');
@@ -335,7 +335,7 @@
         const clearAllBtn = document.getElementById('clearAllBtn');
         const exportBtn = document.getElementById('exportBtn');
         const reloadBtn = document.getElementById('reloadBtn');
-        const resetDefaultBtn = document.getElementById('resetDefaultBtn');
+        const clearStorageBtn = document.getElementById('clearStorageBtn');
         const loadStatus = document.getElementById('loadStatus');
         const sourceBadge = document.getElementById('sourceBadge');
         const itemsUrlInput = document.getElementById('itemsUrlInput');
@@ -344,17 +344,6 @@
         // --- Вспомогательные ---
         function generateId() {
             return 'item_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
-        }
-
-        function save() {
-            localStorage.setItem(STORAGE_KEY_BALANCE, String(balance));
-            localStorage.setItem(STORAGE_KEY_TASKS, JSON.stringify(tasks));
-        }
-
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
         }
 
         function setStatus(type, message) {
@@ -380,8 +369,6 @@
                                 <span class="task-points">${task.points} баллов</span>
                             </div>
                             <div class="task-actions">
-                                <button class="btn btn-outline btn-sm btn-dec" data-id="${task.id}">−5</button>
-                                <button class="btn btn-outline btn-sm btn-inc" data-id="${task.id}">+5</button>
                                 <button class="btn btn-danger btn-sm btn-del" data-id="${task.id}">✕</button>
                             </div>
                         </li>
@@ -390,8 +377,12 @@
                 taskListContainer.innerHTML = html;
                 taskCount.textContent = tasks.length;
             }
+        }
 
-            save();
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
         }
 
         // --- Загрузка из файла ---
@@ -401,7 +392,6 @@
                 
                 const finalUrl = url || DEFAULT_URL;
                 
-                // Загружаем файл как текстовый
                 const response = await fetch(finalUrl);
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -409,10 +399,7 @@
                 
                 const text = await response.text();
                 
-                // Парсим содержимое
                 let data = null;
-                
-                // Пробуем найти массив в тексте
                 const match = text.match(/\[[\s\S]*?\]/);
                 if (match) {
                     try {
@@ -447,27 +434,9 @@
             } catch (error) {
                 console.error('Ошибка загрузки:', error);
                 setStatus('error', `❌ Ошибка: ${error.message}`);
-                
-                // Если файл не найден, загружаем пример
-                if (confirm('Файл не найден. Загрузить пример товаров?')) {
-                    loadDefaultItems();
-                }
+                tasks = [];
+                render();
             }
-        }
-
-        // --- Загрузка примера товаров ---
-        function loadDefaultItems() {
-            tasks = [
-                { id: generateId(), name: 'Наушники Sony', points: 45 },
-                { id: generateId(), name: 'Клавиатура MX', points: 30 },
-                { id: generateId(), name: 'Мышь Logitech', points: 20 },
-                { id: generateId(), name: 'Монитор 24"', points: 80 },
-                { id: generateId(), name: 'Внешний SSD', points: 60 }
-            ];
-            setStatus('success', '📋 Загружен пример');
-            sourceBadge.textContent = 'пример';
-            sourceBadge.style.background = '#ffa502';
-            render();
         }
 
         // --- Экспорт в item.js ---
@@ -500,6 +469,15 @@
             setStatus('success', '📤 Экспортировано в item.js');
         }
 
+        // --- Очистка localStorage ---
+        function clearLocalStorage() {
+            if (confirm('Удалить все данные из localStorage? Это может помочь, если товары не загружаются.')) {
+                localStorage.clear();
+                alert('✅ localStorage полностью очищен! Обновите страницу (F5)');
+                setStatus('success', '🧹 localStorage очищен');
+            }
+        }
+
         // --- Действия ---
         function updateBalance(newBalance) {
             balance = Math.max(0, Math.floor(newBalance));
@@ -526,15 +504,6 @@
             render();
         }
 
-        function changeTaskPoints(id, delta) {
-            const task = tasks.find(t => t.id === id);
-            if (!task) return;
-            const newPoints = task.points + delta;
-            if (newPoints < 1) { alert('Минимум 1 балл'); return; }
-            task.points = newPoints;
-            render();
-        }
-
         function clearAll() {
             if (tasks.length === 0) return;
             if (confirm('Удалить все товары?')) {
@@ -546,10 +515,16 @@
 
         // --- Инициализация ---
         async function init() {
-            // Загружаем сохранённый URL
-            itemsUrlInput.value = itemsUrl || DEFAULT_URL;
+            // Загружаем URL из localStorage (только URL, не товары)
+            const savedUrl = localStorage.getItem(STORAGE_KEY_URL);
+            if (savedUrl) {
+                itemsUrl = savedUrl;
+                itemsUrlInput.value = savedUrl;
+            } else {
+                itemsUrlInput.value = DEFAULT_URL;
+            }
 
-            // Пытаемся загрузить данные
+            // Загружаем товары
             await loadItemsFromUrl(itemsUrl);
 
             // --- События ---
@@ -580,13 +555,10 @@
             exportBtn.addEventListener('click', exportItems);
             
             reloadBtn.addEventListener('click', async () => {
-                await loadItemsFromUrl(itemsUrl || DEFAULT_URL);
+                await loadItemsFromUrl(itemsUrl);
             });
-            
-            resetDefaultBtn.addEventListener('click', () => {
-                if (tasks.length > 0 && !confirm('Заменить текущие товары на пример?')) return;
-                loadDefaultItems();
-            });
+
+            clearStorageBtn.addEventListener('click', clearLocalStorage);
 
             applyUrlBtn.addEventListener('click', () => {
                 const url = itemsUrlInput.value.trim();
@@ -611,16 +583,6 @@
                 if (btn.classList.contains('btn-del')) {
                     const task = tasks.find(t => t.id === id);
                     if (task && confirm(`Удалить "${task.name}"?`)) removeTask(id);
-                    return;
-                }
-
-                if (btn.classList.contains('btn-inc')) {
-                    changeTaskPoints(id, 5);
-                    return;
-                }
-
-                if (btn.classList.contains('btn-dec')) {
-                    changeTaskPoints(id, -5);
                     return;
                 }
             });
