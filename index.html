@@ -5,7 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Калькулятор баллов</title>
     <style>
-        * { box-sizing: border-box; font-family: system-ui, sans-serif; }
+        * {
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+        }
         body {
             margin: 0;
             min-height: 100vh;
@@ -16,15 +19,23 @@
             padding: 20px;
         }
         .container {
-            max-width: 700px;
+            max-width: 750px;
             width: 100%;
             background: white;
             border-radius: 24px;
             padding: 30px;
             box-shadow: 0 8px 30px rgba(0,0,0,0.08);
         }
-        h1 { margin: 0 0 5px 0; font-weight: 600; color: #1a1a2e; }
-        .sub { color: #666; margin-bottom: 25px; font-size: 0.95rem; }
+        h1 {
+            margin: 0 0 5px 0;
+            font-weight: 600;
+            color: #1a1a2e;
+        }
+        .sub {
+            color: #666;
+            margin-bottom: 25px;
+            font-size: 0.95rem;
+        }
         
         .balance-box {
             background: #eef2ff;
@@ -69,23 +80,51 @@
             background: #4a6cf7;
             color: white;
         }
-        .btn-primary:hover { background: #3a56d4; }
+        .btn-primary:hover {
+            background: #3a56d4;
+        }
         .btn-outline {
             background: white;
             border: 1px solid #ddd;
         }
-        .btn-outline:hover { background: #f5f5f5; }
+        .btn-outline:hover {
+            background: #f5f5f5;
+        }
         .btn-danger {
             background: #ff4757;
             color: white;
         }
-        .btn-danger:hover { background: #e63946; }
-        .btn-sm { padding: 4px 10px; font-size: 0.8rem; }
+        .btn-danger:hover {
+            background: #e63946;
+        }
+        .btn-success {
+            background: #2ed573;
+            color: white;
+        }
+        .btn-success:hover {
+            background: #26a65b;
+        }
+        .btn-warning {
+            background: #ffa502;
+            color: white;
+        }
+        .btn-warning:hover {
+            background: #e69500;
+        }
+        .btn-sm {
+            padding: 4px 10px;
+            font-size: 0.8rem;
+        }
 
         .section-title {
             font-weight: 600;
             font-size: 1.1rem;
             margin: 25px 0 12px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
         }
 
         .task-list {
@@ -103,8 +142,12 @@
             margin-bottom: 8px;
             border: 1px solid #eee;
         }
-        .task-item:hover { background: #f5f7ff; }
-        .task-name { font-weight: 500; }
+        .task-item:hover {
+            background: #f5f7ff;
+        }
+        .task-name {
+            font-weight: 500;
+        }
         .task-points {
             background: #e8ecf1;
             padding: 2px 14px;
@@ -113,7 +156,10 @@
             font-weight: 600;
             color: #4a6cf7;
         }
-        .task-actions { display: flex; gap: 6px; }
+        .task-actions {
+            display: flex;
+            gap: 6px;
+        }
 
         .add-area {
             display: flex;
@@ -129,7 +175,10 @@
             font-size: 0.95rem;
             min-width: 120px;
         }
-        .add-area input:focus { outline: none; border-color: #4a6cf7; }
+        .add-area input:focus {
+            outline: none;
+            border-color: #4a6cf7;
+        }
 
         .empty {
             text-align: center;
@@ -154,12 +203,60 @@
             border-radius: 6px;
             font-size: 0.8rem;
         }
+        .badge {
+            background: #4a6cf7;
+            color: white;
+            padding: 2px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+        .status {
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            display: inline-block;
+        }
+        .status-success {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        .status-warning {
+            background: #fff3e0;
+            color: #e65100;
+        }
+        .status-error {
+            background: #ffebee;
+            color: #c62828;
+        }
+        .btn-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+        .url-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            margin-top: 8px;
+            background: #fafafa;
+        }
+        .url-input:focus {
+            outline: none;
+            border-color: #4a6cf7;
+            background: white;
+        }
     </style>
 </head>
 <body>
 <div class="container">
-    <h1>🎯 Баллы</h1>
-    <div class="sub">Управление баллами и товарами</div>
+    <h1>🎯 Калькулятор баллов</h1>
+    <div class="sub">
+        📦 Товары загружаются из <code>item.js</code>
+        <span class="status status-success" id="loadStatus">● Загружено</span>
+    </div>
 
     <!-- Баланс -->
     <div class="balance-box">
@@ -173,9 +270,12 @@
     </div>
 
     <!-- Список товаров -->
-    <div class="section-title">📦 Товары (<span id="taskCount">0</span>)</div>
+    <div class="section-title">
+        <span>📦 Товары (<span id="taskCount">0</span>)</span>
+        <span class="badge" id="sourceBadge">из item.js</span>
+    </div>
     <ul class="task-list" id="taskListContainer">
-        <li class="empty">Нет товаров. Добавьте первый!</li>
+        <li class="empty">Загрузка товаров...</li>
     </ul>
 
     <!-- Добавление товара -->
@@ -186,206 +286,348 @@
     </div>
 
     <!-- Кнопки управления -->
-    <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px;">
+    <div class="btn-group">
         <button class="btn btn-outline btn-sm" id="clearAllBtn">🗑 Очистить всё</button>
-        <button class="btn btn-outline btn-sm" id="addExampleBtn">📋 Добавить пример</button>
+        <button class="btn btn-success btn-sm" id="exportBtn">📤 Экспорт в item.js</button>
+        <button class="btn btn-warning btn-sm" id="reloadBtn">🔄 Перезагрузить</button>
+        <button class="btn btn-outline btn-sm" id="resetDefaultBtn">📋 Загрузить пример</button>
+    </div>
+
+    <!-- Настройка URL для загрузки -->
+    <div style="margin-top: 12px;">
+        <label style="font-size: 0.85rem; color: #666;">🔗 URL для загрузки item.js:</label>
+        <input type="text" id="itemsUrlInput" class="url-input" 
+               placeholder="https://raw.githubusercontent.com/mihail245/ball/refs/heads/main/item.js">
+        <button class="btn btn-outline btn-sm" id="applyUrlBtn" style="margin-top: 6px;">Применить URL</button>
     </div>
 
     <div class="footer">
-        <span>📁 Данные в <code>localStorage</code></span>
-        <span>GitHub Pages ready</span>
+        <span>📁 Данные хранятся в <code>localStorage</code></span>
+        <span>🌐 GitHub Pages ready</span>
     </div>
 </div>
 
 <script>
-(function() {
-    // --- Константы ---
-    const STORAGE_KEY_BALANCE = 'myBalance';
-    const STORAGE_KEY_TASKS = 'myTasks';
+    (function() {
+        "use strict";
 
-    // --- Состояние ---
-    let balance = parseInt(localStorage.getItem(STORAGE_KEY_BALANCE)) || 0;
-    let tasks = JSON.parse(localStorage.getItem(STORAGE_KEY_TASKS)) || [];
+        // --- Константы ---
+        const STORAGE_KEY_BALANCE = 'myBalance';
+        const STORAGE_KEY_TASKS = 'myTasks';
+        const STORAGE_KEY_URL = 'itemsUrl';
+        const DEFAULT_URL = 'https://raw.githubusercontent.com/mihail245/ball/refs/heads/main/item.js';
 
-    // --- DOM элементы ---
-    const balanceDisplay = document.getElementById('balanceDisplay');
-    const pointsInput = document.getElementById('pointsInput');
-    const addPointsBtn = document.getElementById('addPointsBtn');
-    const resetBalanceBtn = document.getElementById('resetBalanceBtn');
-    const taskListContainer = document.getElementById('taskListContainer');
-    const taskCount = document.getElementById('taskCount');
-    const taskNameInput = document.getElementById('taskNameInput');
-    const taskPointsInput = document.getElementById('taskPointsInput');
-    const addTaskBtn = document.getElementById('addTaskBtn');
-    const clearAllBtn = document.getElementById('clearAllBtn');
-    const addExampleBtn = document.getElementById('addExampleBtn');
+        // --- Состояние ---
+        let balance = parseInt(localStorage.getItem(STORAGE_KEY_BALANCE)) || 0;
+        let tasks = [];
+        let itemsUrl = localStorage.getItem(STORAGE_KEY_URL) || DEFAULT_URL;
 
-    // --- Вспомогательные ---
-    function generateId() {
-        return Date.now() + '_' + Math.random().toString(36).slice(2, 8);
-    }
+        // --- DOM элементы ---
+        const balanceDisplay = document.getElementById('balanceDisplay');
+        const pointsInput = document.getElementById('pointsInput');
+        const addPointsBtn = document.getElementById('addPointsBtn');
+        const resetBalanceBtn = document.getElementById('resetBalanceBtn');
+        const taskListContainer = document.getElementById('taskListContainer');
+        const taskCount = document.getElementById('taskCount');
+        const taskNameInput = document.getElementById('taskNameInput');
+        const taskPointsInput = document.getElementById('taskPointsInput');
+        const addTaskBtn = document.getElementById('addTaskBtn');
+        const clearAllBtn = document.getElementById('clearAllBtn');
+        const exportBtn = document.getElementById('exportBtn');
+        const reloadBtn = document.getElementById('reloadBtn');
+        const resetDefaultBtn = document.getElementById('resetDefaultBtn');
+        const loadStatus = document.getElementById('loadStatus');
+        const sourceBadge = document.getElementById('sourceBadge');
+        const itemsUrlInput = document.getElementById('itemsUrlInput');
+        const applyUrlBtn = document.getElementById('applyUrlBtn');
 
-    function save() {
-        localStorage.setItem(STORAGE_KEY_BALANCE, String(balance));
-        localStorage.setItem(STORAGE_KEY_TASKS, JSON.stringify(tasks));
-    }
-
-    function render() {
-        // Баланс
-        balanceDisplay.textContent = balance;
-
-        // Список
-        if (tasks.length === 0) {
-            taskListContainer.innerHTML = '<li class="empty">Нет товаров. Добавьте первый!</li>';
-            taskCount.textContent = '0';
-        } else {
-            let html = '';
-            tasks.forEach(task => {
-                html += `
-                    <li class="task-item" data-id="${task.id}">
-                        <div>
-                            <span class="task-name">${escapeHtml(task.name)}</span>
-                            <span class="task-points">${task.points} баллов</span>
-                        </div>
-                        <div class="task-actions">
-                            <button class="btn btn-outline btn-sm btn-dec" data-id="${task.id}">−5</button>
-                            <button class="btn btn-outline btn-sm btn-inc" data-id="${task.id}">+5</button>
-                            <button class="btn btn-danger btn-sm btn-del" data-id="${task.id}">✕</button>
-                        </div>
-                    </li>
-                `;
-            });
-            taskListContainer.innerHTML = html;
-            taskCount.textContent = tasks.length;
+        // --- Вспомогательные ---
+        function generateId() {
+            return 'item_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
         }
 
-        save();
-    }
+        function save() {
+            localStorage.setItem(STORAGE_KEY_BALANCE, String(balance));
+            localStorage.setItem(STORAGE_KEY_TASKS, JSON.stringify(tasks));
+        }
 
-    function escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
 
-    // --- Действия ---
-    function updateBalance(newBalance) {
-        balance = Math.max(0, Math.floor(newBalance));
-        render();
-    }
+        function setStatus(type, message) {
+            loadStatus.textContent = message;
+            loadStatus.className = 'status status-' + type;
+        }
 
-    function addTask(name, points) {
-        const trimmed = name.trim();
-        if (!trimmed) { alert('Введите название!'); return false; }
-        const pts = parseInt(points);
-        if (isNaN(pts) || pts < 1) { alert('Баллы должны быть > 0'); return false; }
+        function render() {
+            // Баланс
+            balanceDisplay.textContent = balance;
 
-        tasks.push({
-            id: generateId(),
-            name: trimmed,
-            points: pts
-        });
-        render();
-        return true;
-    }
+            // Список
+            if (tasks.length === 0) {
+                taskListContainer.innerHTML = '<li class="empty">Нет товаров. Добавьте первый!</li>';
+                taskCount.textContent = '0';
+            } else {
+                let html = '';
+                tasks.forEach(task => {
+                    html += `
+                        <li class="task-item" data-id="${task.id}">
+                            <div>
+                                <span class="task-name">${escapeHtml(task.name)}</span>
+                                <span class="task-points">${task.points} баллов</span>
+                            </div>
+                            <div class="task-actions">
+                                <button class="btn btn-outline btn-sm btn-dec" data-id="${task.id}">−5</button>
+                                <button class="btn btn-outline btn-sm btn-inc" data-id="${task.id}">+5</button>
+                                <button class="btn btn-danger btn-sm btn-del" data-id="${task.id}">✕</button>
+                            </div>
+                        </li>
+                    `;
+                });
+                taskListContainer.innerHTML = html;
+                taskCount.textContent = tasks.length;
+            }
 
-    function removeTask(id) {
-        tasks = tasks.filter(t => t.id !== id);
-        render();
-    }
+            save();
+        }
 
-    function changeTaskPoints(id, delta) {
-        const task = tasks.find(t => t.id === id);
-        if (!task) return;
-        const newPoints = task.points + delta;
-        if (newPoints < 1) { alert('Минимум 1 балл'); return; }
-        task.points = newPoints;
-        render();
-    }
+        // --- Загрузка из файла ---
+        async function loadItemsFromUrl(url) {
+            try {
+                setStatus('warning', '⏳ Загрузка...');
+                
+                const finalUrl = url || DEFAULT_URL;
+                
+                // Загружаем файл как текстовый
+                const response = await fetch(finalUrl);
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const text = await response.text();
+                
+                // Парсим содержимое
+                let data = null;
+                
+                // Пробуем найти массив в тексте
+                const match = text.match(/\[[\s\S]*?\]/);
+                if (match) {
+                    try {
+                        data = JSON.parse(match[0]);
+                    } catch (e) {
+                        try {
+                            const func = new Function('return ' + match[0]);
+                            data = func();
+                        } catch (e2) {
+                            throw new Error('Не удалось распарсить данные');
+                        }
+                    }
+                }
+                
+                if (data && Array.isArray(data) && data.length > 0) {
+                    tasks = data.map(item => ({
+                        id: item.id || generateId(),
+                        name: item.name || 'Без названия',
+                        points: parseInt(item.points) || 10
+                    }));
+                    setStatus('success', `✅ Загружено ${tasks.length} товаров`);
+                    sourceBadge.textContent = `из item.js`;
+                    sourceBadge.style.background = '#4a6cf7';
+                    render();
+                } else {
+                    tasks = [];
+                    setStatus('warning', '⚠️ Файл пуст или данные не найдены');
+                    sourceBadge.textContent = 'пусто';
+                    sourceBadge.style.background = '#ff9800';
+                    render();
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки:', error);
+                setStatus('error', `❌ Ошибка: ${error.message}`);
+                
+                // Если файл не найден, загружаем пример
+                if (confirm('Файл не найден. Загрузить пример товаров?')) {
+                    loadDefaultItems();
+                }
+            }
+        }
 
-    function clearAll() {
-        if (tasks.length === 0) return;
-        if (confirm('Удалить все товары?')) {
-            tasks = [];
+        // --- Загрузка примера товаров ---
+        function loadDefaultItems() {
+            tasks = [
+                { id: generateId(), name: 'Наушники Sony', points: 45 },
+                { id: generateId(), name: 'Клавиатура MX', points: 30 },
+                { id: generateId(), name: 'Мышь Logitech', points: 20 },
+                { id: generateId(), name: 'Монитор 24"', points: 80 },
+                { id: generateId(), name: 'Внешний SSD', points: 60 }
+            ];
+            setStatus('success', '📋 Загружен пример');
+            sourceBadge.textContent = 'пример';
+            sourceBadge.style.background = '#ffa502';
             render();
         }
-    }
 
-    function addExample() {
-        const examples = [
-            { name: 'Наушники', points: 30 },
-            { name: 'Клавиатура', points: 25 },
-            { name: 'Мышь', points: 15 }
-        ];
-        examples.forEach(ex => {
+        // --- Экспорт в item.js ---
+        function exportItems() {
+            if (tasks.length === 0) {
+                alert('Нет товаров для экспорта');
+                return;
+            }
+
+            let content = '// item.js - список товаров\n';
+            content += 'const ITEMS_DATA = [\n';
+            tasks.forEach((task, index) => {
+                content += `    { id: "${task.id}", name: "${task.name}", points: ${task.points} }`;
+                if (index < tasks.length - 1) content += ',';
+                content += '\n';
+            });
+            content += '];\n\n';
+            content += 'export default ITEMS_DATA;\n';
+
+            const blob = new Blob([content], { type: 'text/javascript' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'item.js';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            setStatus('success', '📤 Экспортировано в item.js');
+        }
+
+        // --- Действия ---
+        function updateBalance(newBalance) {
+            balance = Math.max(0, Math.floor(newBalance));
+            render();
+        }
+
+        function addTask(name, points) {
+            const trimmed = name.trim();
+            if (!trimmed) { alert('Введите название!'); return false; }
+            const pts = parseInt(points);
+            if (isNaN(pts) || pts < 1) { alert('Баллы должны быть > 0'); return false; }
+
             tasks.push({
                 id: generateId(),
-                name: ex.name,
-                points: ex.points
+                name: trimmed,
+                points: pts
             });
-        });
-        render();
-    }
+            render();
+            return true;
+        }
 
-    // --- Инициализация ---
-    function init() {
-        // Если tasks пустые, но в localStorage нет — оставляем пустыми (максимально пусто)
-        render();
+        function removeTask(id) {
+            tasks = tasks.filter(t => t.id !== id);
+            render();
+        }
 
-        // --- События ---
-        addPointsBtn.addEventListener('click', () => {
-            const val = parseInt(pointsInput.value);
-            if (isNaN(val) || val < 1) { alert('Введите положительное число'); return; }
-            updateBalance(balance + val);
-        });
+        function changeTaskPoints(id, delta) {
+            const task = tasks.find(t => t.id === id);
+            if (!task) return;
+            const newPoints = task.points + delta;
+            if (newPoints < 1) { alert('Минимум 1 балл'); return; }
+            task.points = newPoints;
+            render();
+        }
 
-        resetBalanceBtn.addEventListener('click', () => {
-            if (balance === 0) return;
-            if (confirm('Сбросить баланс до 0?')) updateBalance(0);
-        });
-
-        addTaskBtn.addEventListener('click', () => {
-            addTask(taskNameInput.value, taskPointsInput.value);
-            taskNameInput.value = '';
-            taskPointsInput.value = '10';
-            taskNameInput.focus();
-        });
-
-        // Enter
-        taskNameInput.addEventListener('keypress', e => { if (e.key === 'Enter') addTaskBtn.click(); });
-        taskPointsInput.addEventListener('keypress', e => { if (e.key === 'Enter') addTaskBtn.click(); });
-        pointsInput.addEventListener('keypress', e => { if (e.key === 'Enter') addPointsBtn.click(); });
-
-        clearAllBtn.addEventListener('click', clearAll);
-        addExampleBtn.addEventListener('click', addExample);
-
-        // Делегирование для кнопок в списке
-        taskListContainer.addEventListener('click', (e) => {
-            const btn = e.target.closest('button');
-            if (!btn) return;
-            const id = btn.dataset.id;
-            if (!id) return;
-
-            if (btn.classList.contains('btn-del')) {
-                const task = tasks.find(t => t.id === id);
-                if (task && confirm(`Удалить "${task.name}"?`)) removeTask(id);
-                return;
+        function clearAll() {
+            if (tasks.length === 0) return;
+            if (confirm('Удалить все товары?')) {
+                tasks = [];
+                render();
+                setStatus('warning', '🗑 Все товары удалены');
             }
+        }
 
-            if (btn.classList.contains('btn-inc')) {
-                changeTaskPoints(id, 5);
-                return;
-            }
+        // --- Инициализация ---
+        async function init() {
+            // Загружаем сохранённый URL
+            itemsUrlInput.value = itemsUrl || DEFAULT_URL;
 
-            if (btn.classList.contains('btn-dec')) {
-                changeTaskPoints(id, -5);
-                return;
-            }
-        });
-    }
+            // Пытаемся загрузить данные
+            await loadItemsFromUrl(itemsUrl);
 
-    init();
-})();
+            // --- События ---
+            addPointsBtn.addEventListener('click', () => {
+                const val = parseInt(pointsInput.value);
+                if (isNaN(val) || val < 1) { alert('Введите положительное число'); return; }
+                updateBalance(balance + val);
+            });
+
+            resetBalanceBtn.addEventListener('click', () => {
+                if (balance === 0) return;
+                if (confirm('Сбросить баланс до 0?')) updateBalance(0);
+            });
+
+            addTaskBtn.addEventListener('click', () => {
+                addTask(taskNameInput.value, taskPointsInput.value);
+                taskNameInput.value = '';
+                taskPointsInput.value = '10';
+                taskNameInput.focus();
+            });
+
+            taskNameInput.addEventListener('keypress', e => { if (e.key === 'Enter') addTaskBtn.click(); });
+            taskPointsInput.addEventListener('keypress', e => { if (e.key === 'Enter') addTaskBtn.click(); });
+            pointsInput.addEventListener('keypress', e => { if (e.key === 'Enter') addPointsBtn.click(); });
+
+            clearAllBtn.addEventListener('click', clearAll);
+            
+            exportBtn.addEventListener('click', exportItems);
+            
+            reloadBtn.addEventListener('click', async () => {
+                await loadItemsFromUrl(itemsUrl || DEFAULT_URL);
+            });
+            
+            resetDefaultBtn.addEventListener('click', () => {
+                if (tasks.length > 0 && !confirm('Заменить текущие товары на пример?')) return;
+                loadDefaultItems();
+            });
+
+            applyUrlBtn.addEventListener('click', () => {
+                const url = itemsUrlInput.value.trim();
+                if (url) {
+                    itemsUrl = url;
+                    localStorage.setItem(STORAGE_KEY_URL, url);
+                    loadItemsFromUrl(url);
+                } else {
+                    itemsUrl = DEFAULT_URL;
+                    localStorage.removeItem(STORAGE_KEY_URL);
+                    loadItemsFromUrl(DEFAULT_URL);
+                }
+            });
+
+            // Делегирование для кнопок в списке
+            taskListContainer.addEventListener('click', (e) => {
+                const btn = e.target.closest('button');
+                if (!btn) return;
+                const id = btn.dataset.id;
+                if (!id) return;
+
+                if (btn.classList.contains('btn-del')) {
+                    const task = tasks.find(t => t.id === id);
+                    if (task && confirm(`Удалить "${task.name}"?`)) removeTask(id);
+                    return;
+                }
+
+                if (btn.classList.contains('btn-inc')) {
+                    changeTaskPoints(id, 5);
+                    return;
+                }
+
+                if (btn.classList.contains('btn-dec')) {
+                    changeTaskPoints(id, -5);
+                    return;
+                }
+            });
+        }
+
+        init();
+    })();
 </script>
 </body>
 </html>
