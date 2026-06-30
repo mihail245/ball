@@ -36,10 +36,43 @@
             font-size: 0.95rem;
         }
 
+        /* Вкладки */
+        .tabs {
+            display: flex;
+            gap: 0;
+            margin: 20px 0 0 0;
+            border-bottom: 2px solid #e8ecf1;
+        }
+        .tab-btn {
+            padding: 12px 24px;
+            border: none;
+            background: none;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            color: #888;
+            border-bottom: 3px solid transparent;
+            transition: 0.2s;
+        }
+        .tab-btn:hover {
+            color: #4a6cf7;
+        }
+        .tab-btn.active {
+            color: #4a6cf7;
+            border-bottom-color: #4a6cf7;
+        }
+        .tab-content {
+            display: none;
+            padding-top: 15px;
+        }
+        .tab-content.active {
+            display: block;
+        }
+
         .section-title {
             font-weight: 600;
             font-size: 1.1rem;
-            margin: 20px 0 12px 0;
+            margin: 0 0 12px 0;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -50,7 +83,7 @@
         .task-list {
             list-style: none;
             padding: 0;
-            margin: 0 0 20px 0;
+            margin: 0;
         }
         .task-item {
             display: flex;
@@ -173,9 +206,6 @@
         .badge-success {
             background: #2ed573;
         }
-        .badge-warning {
-            background: #ffa502;
-        }
 
         .status {
             padding: 4px 14px;
@@ -186,6 +216,14 @@
         .status-success {
             background: #e8f5e9;
             color: #2e7d32;
+        }
+        .status-warning {
+            background: #fff3e0;
+            color: #e65100;
+        }
+        .status-error {
+            background: #ffebee;
+            color: #c62828;
         }
 
         .total-box {
@@ -213,7 +251,7 @@
             display: flex;
             gap: 8px;
             flex-wrap: wrap;
-            margin-top: 10px;
+            margin: 15px 0 10px 0;
         }
         .url-input {
             width: 100%;
@@ -246,6 +284,17 @@
         .completed-item .task-name {
             text-decoration: line-through;
         }
+        .tab-count {
+            background: #e8ecf1;
+            padding: 0 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            margin-left: 6px;
+        }
+        .tab-btn.active .tab-count {
+            background: #4a6cf7;
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -256,23 +305,28 @@
         <span class="status status-success" id="loadStatus">● Загружено</span>
     </div>
 
-    <!-- Активные товары -->
-    <div class="section-title">
-        <span>📋 Активные товары (<span id="activeCount">0</span>)</span>
-        <span class="badge" id="sourceBadge">из item.js</span>
+    <!-- Вкладки -->
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="active">
+            📋 Активные <span class="tab-count" id="activeTabCount">0</span>
+        </button>
+        <button class="tab-btn" data-tab="completed">
+            ✅ Полученные <span class="tab-count" id="completedTabCount">0</span>
+        </button>
     </div>
-    <ul class="task-list" id="taskListContainer">
-        <li class="empty">Нет активных товаров</li>
-    </ul>
 
-    <!-- Полученные товары -->
-    <div class="section-title">
-        <span>✅ Полученные товары (<span id="completedCount">0</span>)</span>
-        <span class="badge badge-success">✅ Получено</span>
+    <!-- Содержимое вкладок -->
+    <div class="tab-content active" id="tab-active">
+        <ul class="task-list" id="taskListContainer">
+            <li class="empty">Нет активных товаров</li>
+        </ul>
     </div>
-    <ul class="task-list" id="completedListContainer">
-        <li class="empty">Нет полученных товаров</li>
-    </ul>
+
+    <div class="tab-content" id="tab-completed">
+        <ul class="task-list" id="completedListContainer">
+            <li class="empty">Нет полученных товаров</li>
+        </ul>
+    </div>
 
     <!-- Итоговая сумма -->
     <div class="total-box">
@@ -317,10 +371,11 @@
         let completedTasks = [];
         let itemsUrl = DEFAULT_URL;
 
+        // DOM элементы
         const taskListContainer = document.getElementById('taskListContainer');
         const completedListContainer = document.getElementById('completedListContainer');
-        const activeCount = document.getElementById('activeCount');
-        const completedCount = document.getElementById('completedCount');
+        const activeTabCount = document.getElementById('activeTabCount');
+        const completedTabCount = document.getElementById('completedTabCount');
         const totalSum = document.getElementById('totalSum');
         const taskNameInput = document.getElementById('taskNameInput');
         const taskPointsSelect = document.getElementById('taskPointsSelect');
@@ -329,9 +384,10 @@
         const reloadBtn = document.getElementById('reloadBtn');
         const clearCompletedBtn = document.getElementById('clearCompletedBtn');
         const loadStatus = document.getElementById('loadStatus');
-        const sourceBadge = document.getElementById('sourceBadge');
         const itemsUrlInput = document.getElementById('itemsUrlInput');
         const applyUrlBtn = document.getElementById('applyUrlBtn');
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
 
         function generateId() {
             return 'item_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
@@ -348,11 +404,26 @@
             return div.innerHTML;
         }
 
+        // Переключение вкладок
+        function switchTab(tabId) {
+            tabBtns.forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.tab === tabId);
+            });
+            tabContents.forEach(content => {
+                content.classList.toggle('active', content.id === 'tab-' + tabId);
+            });
+        }
+
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                switchTab(btn.dataset.tab);
+            });
+        });
+
         function render() {
             // Активные товары
             if (activeTasks.length === 0) {
                 taskListContainer.innerHTML = '<li class="empty">Нет активных товаров</li>';
-                activeCount.textContent = '0';
             } else {
                 let html = '';
                 activeTasks.forEach(task => {
@@ -370,13 +441,11 @@
                     `;
                 });
                 taskListContainer.innerHTML = html;
-                activeCount.textContent = activeTasks.length;
             }
 
             // Полученные товары
             if (completedTasks.length === 0) {
                 completedListContainer.innerHTML = '<li class="empty">Нет полученных товаров</li>';
-                completedCount.textContent = '0';
             } else {
                 let html = '';
                 completedTasks.forEach(task => {
@@ -394,8 +463,11 @@
                     `;
                 });
                 completedListContainer.innerHTML = html;
-                completedCount.textContent = completedTasks.length;
             }
+
+            // Обновляем счётчики на вкладках
+            activeTabCount.textContent = activeTasks.length;
+            completedTabCount.textContent = completedTasks.length;
 
             // Подсчёт суммы
             const sum = completedTasks.reduce((acc, t) => acc + t.points, 0);
@@ -431,22 +503,30 @@
                 }
                 
                 if (data && Array.isArray(data) && data.length > 0) {
-                    activeTasks = data.map(item => ({
-                        id: item.id || generateId(),
-                        name: item.name || 'Без названия',
-                        points: parseInt(item.points) || 250
-                    }));
+                    activeTasks = [];
                     completedTasks = [];
-                    setStatus('success', `✅ Загружено ${activeTasks.length} товаров`);
-                    sourceBadge.textContent = `из item.js`;
-                    sourceBadge.style.background = '#4a6cf7';
+                    
+                    data.forEach(item => {
+                        const task = {
+                            id: item.id || generateId(),
+                            name: item.name || 'Без названия',
+                            points: parseInt(item.points) || 250,
+                            completed: item.completed === true
+                        };
+                        
+                        if (task.completed) {
+                            completedTasks.push(task);
+                        } else {
+                            activeTasks.push(task);
+                        }
+                    });
+                    
+                    setStatus('success', `✅ Загружено ${data.length} товаров (${activeTasks.length} активных, ${completedTasks.length} полученных)`);
                     render();
                 } else {
                     activeTasks = [];
                     completedTasks = [];
                     setStatus('warning', '⚠️ Файл пуст или данные не найдены');
-                    sourceBadge.textContent = 'пусто';
-                    sourceBadge.style.background = '#ff9800';
                     render();
                 }
             } catch (error) {
@@ -468,7 +548,8 @@
             let content = '// item.js - список товаров\n';
             content += 'const ITEMS_DATA = [\n';
             allTasks.forEach((task, index) => {
-                content += `    { id: "${task.id}", name: "${task.name}", points: ${task.points} }`;
+                const isCompleted = completedTasks.some(t => t.id === task.id);
+                content += `    { id: "${task.id}", name: "${task.name}", points: ${task.points}, completed: ${isCompleted} }`;
                 if (index < allTasks.length - 1) content += ',';
                 content += '\n';
             });
@@ -497,7 +578,8 @@
             activeTasks.push({
                 id: generateId(),
                 name: trimmed,
-                points: pts
+                points: pts,
+                completed: false
             });
             render();
             return true;
@@ -517,6 +599,7 @@
             const index = activeTasks.findIndex(t => t.id === id);
             if (index === -1) return;
             const task = activeTasks.splice(index, 1)[0];
+            task.completed = true;
             completedTasks.push(task);
             render();
         }
@@ -525,6 +608,7 @@
             const index = completedTasks.findIndex(t => t.id === id);
             if (index === -1) return;
             const task = completedTasks.splice(index, 1)[0];
+            task.completed = false;
             activeTasks.push(task);
             render();
         }
@@ -540,6 +624,9 @@
         async function init() {
             itemsUrlInput.value = DEFAULT_URL;
             await loadItemsFromUrl(DEFAULT_URL);
+
+            // Переключаемся на первую вкладку
+            switchTab('active');
 
             addTaskBtn.addEventListener('click', () => {
                 addTask(taskNameInput.value, taskPointsSelect.value);
