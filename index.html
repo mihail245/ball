@@ -53,6 +53,9 @@
             color: #888;
             border-bottom: 3px solid transparent;
             transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
         .tab-btn:hover {
             color: #4a6cf7;
@@ -235,7 +238,7 @@
             align-items: center;
             flex-wrap: wrap;
             gap: 12px;
-            margin-top: 20px;
+            margin: 15px 0;
         }
         .total-label {
             font-weight: 600;
@@ -289,11 +292,18 @@
             padding: 0 8px;
             border-radius: 12px;
             font-size: 0.75rem;
-            margin-left: 6px;
         }
         .tab-btn.active .tab-count {
             background: #4a6cf7;
             color: white;
+        }
+        .tab-total {
+            font-size: 0.8rem;
+            color: #666;
+            font-weight: 400;
+        }
+        .tab-btn.active .tab-total {
+            color: #4a6cf7;
         }
     </style>
 </head>
@@ -308,10 +318,14 @@
     <!-- Вкладки -->
     <div class="tabs">
         <button class="tab-btn active" data-tab="active">
-            📋 Активные <span class="tab-count" id="activeTabCount">0</span>
+            📋 Активные 
+            <span class="tab-count" id="activeTabCount">0</span>
+            <span class="tab-total" id="activeTabTotal">(0 баллов)</span>
         </button>
         <button class="tab-btn" data-tab="completed">
-            ✅ Полученные <span class="tab-count" id="completedTabCount">0</span>
+            ✅ Полученные 
+            <span class="tab-count" id="completedTabCount">0</span>
+            <span class="tab-total" id="completedTabTotal">(0 баллов)</span>
         </button>
     </div>
 
@@ -326,12 +340,6 @@
         <ul class="task-list" id="completedListContainer">
             <li class="empty">Нет полученных товаров</li>
         </ul>
-    </div>
-
-    <!-- Итоговая сумма -->
-    <div class="total-box">
-        <span class="total-label">💰 Итого баллов:</span>
-        <span class="total-value" id="totalSum">0</span>
     </div>
 
     <!-- Добавление товара -->
@@ -376,7 +384,8 @@
         const completedListContainer = document.getElementById('completedListContainer');
         const activeTabCount = document.getElementById('activeTabCount');
         const completedTabCount = document.getElementById('completedTabCount');
-        const totalSum = document.getElementById('totalSum');
+        const activeTabTotal = document.getElementById('activeTabTotal');
+        const completedTabTotal = document.getElementById('completedTabTotal');
         const taskNameInput = document.getElementById('taskNameInput');
         const taskPointsSelect = document.getElementById('taskPointsSelect');
         const addTaskBtn = document.getElementById('addTaskBtn');
@@ -465,13 +474,15 @@
                 completedListContainer.innerHTML = html;
             }
 
-            // Обновляем счётчики на вкладках
+            // Подсчёт сумм
+            const activeSum = activeTasks.reduce((acc, t) => acc + t.points, 0);
+            const completedSum = completedTasks.reduce((acc, t) => acc + t.points, 0);
+
+            // Обновляем счётчики и суммы на вкладках
             activeTabCount.textContent = activeTasks.length;
             completedTabCount.textContent = completedTasks.length;
-
-            // Подсчёт суммы
-            const sum = completedTasks.reduce((acc, t) => acc + t.points, 0);
-            totalSum.textContent = sum;
+            activeTabTotal.textContent = `(${activeSum} баллов)`;
+            completedTabTotal.textContent = `(${completedSum} баллов)`;
         }
 
         async function loadItemsFromUrl(url) {
