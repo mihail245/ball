@@ -1,4 +1,6 @@
+// item.js - список товаров
 const ITEMS_DATA = [
+    // --- Первая партия (15 товаров) ---
     { id: "item_1", name: "Держатель для стакана, 2 шт", points: 250, completed: false },
     { id: "item_2", name: "Духи мужские стойкие Блю седактон Blue seduction 10 мл", points: 250, completed: false },
     { id: "item_3", name: "Антенна для SMA мужской 868 МГц 5,8 дБи", points: 250, completed: false },
@@ -14,6 +16,8 @@ const ITEMS_DATA = [
     { id: "item_13", name: "Очки солнцезащитные белые", points: 200, completed: false },
     { id: "item_14", name: "Очки солнцезащитные жёлтые", points: 200, completed: false },
     { id: "item_15", name: "Ароматизатор автомобильный синий колокольчик", points: 250, completed: false },
+
+    // --- Вторая партия (15 товаров) ---
     { id: "item_16", name: "Ароматизатор автомобильный, роза", points: 250, completed: false },
     { id: "item_17", name: "Мелки для волос", points: 200, completed: false },
     { id: "item_18", name: "Искусственные цветы, 1шт", points: 250, completed: false },
@@ -27,7 +31,7 @@ const ITEMS_DATA = [
     { id: "item_26", name: "Пояс", points: 250, completed: false },
     { id: "item_27", name: "Чехол для Realme 5i полностью закрытый силиконовый", points: 250, completed: false },
     { id: "item_28", name: "Серьги зеленые", points: 250, completed: false },
-    { id: "item_29", name: "Серьги голубые с красным", points: 250, completed: false }
+    { id: "item_29", name: "Серьги голубые с красным", points: 250, completed: false },
     { id: "item_30", name: "Серьги голубые", points: 250, completed: false }
 ];
 export default ITEMS_DATA;
