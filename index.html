@@ -15,11 +15,10 @@
             background: #f0f2f5;
             display: flex;
             justify-content: center;
-            align-items: center;
             padding: 20px;
         }
         .container {
-            max-width: 750px;
+            max-width: 800px;
             width: 100%;
             background: white;
             border-radius: 24px;
@@ -36,11 +35,11 @@
             margin-bottom: 25px;
             font-size: 0.95rem;
         }
-        
+
         .section-title {
             font-weight: 600;
             font-size: 1.1rem;
-            margin: 25px 0 12px 0;
+            margin: 20px 0 12px 0;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -100,11 +99,19 @@
             outline: none;
             border-color: #4a6cf7;
         }
+        .add-area select {
+            padding: 10px 14px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            background: white;
+            cursor: pointer;
+        }
 
         .empty {
             text-align: center;
             color: #999;
-            padding: 30px 0;
+            padding: 20px 0;
         }
 
         .btn {
@@ -123,12 +130,12 @@
         .btn-primary:hover {
             background: #3a56d4;
         }
-        .btn-outline {
-            background: white;
-            border: 1px solid #ddd;
+        .btn-success {
+            background: #2ed573;
+            color: white;
         }
-        .btn-outline:hover {
-            background: #f5f5f5;
+        .btn-success:hover {
+            background: #26a65b;
         }
         .btn-danger {
             background: #ff4757;
@@ -137,19 +144,19 @@
         .btn-danger:hover {
             background: #e63946;
         }
-        .btn-success {
-            background: #2ed573;
-            color: white;
-        }
-        .btn-success:hover {
-            background: #26a65b;
-        }
         .btn-warning {
             background: #ffa502;
             color: white;
         }
         .btn-warning:hover {
             background: #e69500;
+        }
+        .btn-outline {
+            background: white;
+            border: 1px solid #ddd;
+        }
+        .btn-outline:hover {
+            background: #f5f5f5;
         }
         .btn-sm {
             padding: 4px 10px;
@@ -163,6 +170,13 @@
             border-radius: 20px;
             font-size: 0.8rem;
         }
+        .badge-success {
+            background: #2ed573;
+        }
+        .badge-warning {
+            background: #ffa502;
+        }
+
         .status {
             padding: 4px 14px;
             border-radius: 20px;
@@ -173,14 +187,28 @@
             background: #e8f5e9;
             color: #2e7d32;
         }
-        .status-warning {
-            background: #fff3e0;
-            color: #e65100;
+
+        .total-box {
+            background: #eef2ff;
+            border-radius: 16px;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 20px;
         }
-        .status-error {
-            background: #ffebee;
-            color: #c62828;
+        .total-label {
+            font-weight: 600;
+            font-size: 1.1rem;
         }
+        .total-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #4a6cf7;
+        }
+
         .btn-group {
             display: flex;
             gap: 8px;
@@ -209,6 +237,15 @@
             padding-top: 12px;
             text-align: center;
         }
+
+        .completed-item {
+            opacity: 0.7;
+            background: #f0faf0;
+            border-color: #b8e0c7;
+        }
+        .completed-item .task-name {
+            text-decoration: line-through;
+        }
     </style>
 </head>
 <body>
@@ -219,19 +256,37 @@
         <span class="status status-success" id="loadStatus">● Загружено</span>
     </div>
 
-    <!-- Список товаров -->
+    <!-- Активные товары -->
     <div class="section-title">
-        <span>📦 Товары (<span id="taskCount">0</span>)</span>
+        <span>📋 Активные товары (<span id="activeCount">0</span>)</span>
         <span class="badge" id="sourceBadge">из item.js</span>
     </div>
     <ul class="task-list" id="taskListContainer">
-        <li class="empty">Загрузка товаров...</li>
+        <li class="empty">Нет активных товаров</li>
     </ul>
+
+    <!-- Полученные товары -->
+    <div class="section-title">
+        <span>✅ Полученные товары (<span id="completedCount">0</span>)</span>
+        <span class="badge badge-success">✅ Получено</span>
+    </div>
+    <ul class="task-list" id="completedListContainer">
+        <li class="empty">Нет полученных товаров</li>
+    </ul>
+
+    <!-- Итоговая сумма -->
+    <div class="total-box">
+        <span class="total-label">💰 Итого баллов:</span>
+        <span class="total-value" id="totalSum">0</span>
+    </div>
 
     <!-- Добавление товара -->
     <div class="add-area">
         <input type="text" id="taskNameInput" placeholder="Название товара">
-        <input type="number" id="taskPointsInput" value="10" min="1" style="max-width: 100px;">
+        <select id="taskPointsSelect">
+            <option value="250">250 баллов</option>
+            <option value="200">200 баллов</option>
+        </select>
         <button class="btn btn-primary" id="addTaskBtn">➕ Добавить</button>
     </div>
 
@@ -239,9 +294,10 @@
     <div class="btn-group">
         <button class="btn btn-success btn-sm" id="exportBtn">📤 Экспорт в item.js</button>
         <button class="btn btn-warning btn-sm" id="reloadBtn">🔄 Перезагрузить</button>
+        <button class="btn btn-danger btn-sm" id="clearCompletedBtn">🗑 Очистить полученные</button>
     </div>
 
-    <!-- Настройка URL для загрузки -->
+    <!-- Настройка URL -->
     <div style="margin-top: 12px;">
         <label style="font-size: 0.85rem; color: #666;">🔗 URL для загрузки item.js:</label>
         <input type="text" id="itemsUrlInput" class="url-input" 
@@ -257,16 +313,21 @@
         "use strict";
 
         const DEFAULT_URL = 'https://raw.githubusercontent.com/mihail245/ball/refs/heads/main/item.js';
-        let tasks = [];
+        let activeTasks = [];
+        let completedTasks = [];
         let itemsUrl = DEFAULT_URL;
 
         const taskListContainer = document.getElementById('taskListContainer');
-        const taskCount = document.getElementById('taskCount');
+        const completedListContainer = document.getElementById('completedListContainer');
+        const activeCount = document.getElementById('activeCount');
+        const completedCount = document.getElementById('completedCount');
+        const totalSum = document.getElementById('totalSum');
         const taskNameInput = document.getElementById('taskNameInput');
-        const taskPointsInput = document.getElementById('taskPointsInput');
+        const taskPointsSelect = document.getElementById('taskPointsSelect');
         const addTaskBtn = document.getElementById('addTaskBtn');
         const exportBtn = document.getElementById('exportBtn');
         const reloadBtn = document.getElementById('reloadBtn');
+        const clearCompletedBtn = document.getElementById('clearCompletedBtn');
         const loadStatus = document.getElementById('loadStatus');
         const sourceBadge = document.getElementById('sourceBadge');
         const itemsUrlInput = document.getElementById('itemsUrlInput');
@@ -281,13 +342,20 @@
             loadStatus.className = 'status status-' + type;
         }
 
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
         function render() {
-            if (tasks.length === 0) {
-                taskListContainer.innerHTML = '<li class="empty">Нет товаров. Добавьте первый!</li>';
-                taskCount.textContent = '0';
+            // Активные товары
+            if (activeTasks.length === 0) {
+                taskListContainer.innerHTML = '<li class="empty">Нет активных товаров</li>';
+                activeCount.textContent = '0';
             } else {
                 let html = '';
-                tasks.forEach(task => {
+                activeTasks.forEach(task => {
                     html += `
                         <li class="task-item" data-id="${task.id}">
                             <div>
@@ -295,20 +363,43 @@
                                 <span class="task-points">${task.points} баллов</span>
                             </div>
                             <div class="task-actions">
+                                <button class="btn btn-success btn-sm btn-complete" data-id="${task.id}">✅ Получен</button>
                                 <button class="btn btn-danger btn-sm btn-del" data-id="${task.id}">✕</button>
                             </div>
                         </li>
                     `;
                 });
                 taskListContainer.innerHTML = html;
-                taskCount.textContent = tasks.length;
+                activeCount.textContent = activeTasks.length;
             }
-        }
 
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
+            // Полученные товары
+            if (completedTasks.length === 0) {
+                completedListContainer.innerHTML = '<li class="empty">Нет полученных товаров</li>';
+                completedCount.textContent = '0';
+            } else {
+                let html = '';
+                completedTasks.forEach(task => {
+                    html += `
+                        <li class="task-item completed-item" data-id="${task.id}">
+                            <div>
+                                <span class="task-name">${escapeHtml(task.name)}</span>
+                                <span class="task-points">${task.points} баллов</span>
+                            </div>
+                            <div class="task-actions">
+                                <button class="btn btn-outline btn-sm btn-undo" data-id="${task.id}">↩️ Вернуть</button>
+                                <button class="btn btn-danger btn-sm btn-del-completed" data-id="${task.id}">✕</button>
+                            </div>
+                        </li>
+                    `;
+                });
+                completedListContainer.innerHTML = html;
+                completedCount.textContent = completedTasks.length;
+            }
+
+            // Подсчёт суммы
+            const sum = completedTasks.reduce((acc, t) => acc + t.points, 0);
+            totalSum.textContent = sum;
         }
 
         async function loadItemsFromUrl(url) {
@@ -340,17 +431,19 @@
                 }
                 
                 if (data && Array.isArray(data) && data.length > 0) {
-                    tasks = data.map(item => ({
+                    activeTasks = data.map(item => ({
                         id: item.id || generateId(),
                         name: item.name || 'Без названия',
-                        points: parseInt(item.points) || 10
+                        points: parseInt(item.points) || 250
                     }));
-                    setStatus('success', `✅ Загружено ${tasks.length} товаров`);
+                    completedTasks = [];
+                    setStatus('success', `✅ Загружено ${activeTasks.length} товаров`);
                     sourceBadge.textContent = `из item.js`;
                     sourceBadge.style.background = '#4a6cf7';
                     render();
                 } else {
-                    tasks = [];
+                    activeTasks = [];
+                    completedTasks = [];
                     setStatus('warning', '⚠️ Файл пуст или данные не найдены');
                     sourceBadge.textContent = 'пусто';
                     sourceBadge.style.background = '#ff9800';
@@ -359,22 +452,24 @@
             } catch (error) {
                 console.error('Ошибка загрузки:', error);
                 setStatus('error', `❌ Ошибка: ${error.message}`);
-                tasks = [];
+                activeTasks = [];
+                completedTasks = [];
                 render();
             }
         }
 
         function exportItems() {
-            if (tasks.length === 0) {
+            const allTasks = [...activeTasks, ...completedTasks];
+            if (allTasks.length === 0) {
                 alert('Нет товаров для экспорта');
                 return;
             }
 
             let content = '// item.js - список товаров\n';
             content += 'const ITEMS_DATA = [\n';
-            tasks.forEach((task, index) => {
+            allTasks.forEach((task, index) => {
                 content += `    { id: "${task.id}", name: "${task.name}", points: ${task.points} }`;
-                if (index < tasks.length - 1) content += ',';
+                if (index < allTasks.length - 1) content += ',';
                 content += '\n';
             });
             content += '];\n\n';
@@ -397,9 +492,9 @@
             const trimmed = name.trim();
             if (!trimmed) { alert('Введите название!'); return false; }
             const pts = parseInt(points);
-            if (isNaN(pts) || pts < 1) { alert('Баллы должны быть > 0'); return false; }
+            if (isNaN(pts) || pts < 1) { alert('Выберите количество баллов'); return false; }
 
-            tasks.push({
+            activeTasks.push({
                 id: generateId(),
                 name: trimmed,
                 points: pts
@@ -408,9 +503,38 @@
             return true;
         }
 
-        function removeTask(id) {
-            tasks = tasks.filter(t => t.id !== id);
+        function removeActiveTask(id) {
+            activeTasks = activeTasks.filter(t => t.id !== id);
             render();
+        }
+
+        function removeCompletedTask(id) {
+            completedTasks = completedTasks.filter(t => t.id !== id);
+            render();
+        }
+
+        function completeTask(id) {
+            const index = activeTasks.findIndex(t => t.id === id);
+            if (index === -1) return;
+            const task = activeTasks.splice(index, 1)[0];
+            completedTasks.push(task);
+            render();
+        }
+
+        function undoTask(id) {
+            const index = completedTasks.findIndex(t => t.id === id);
+            if (index === -1) return;
+            const task = completedTasks.splice(index, 1)[0];
+            activeTasks.push(task);
+            render();
+        }
+
+        function clearCompleted() {
+            if (completedTasks.length === 0) return;
+            if (confirm('Удалить все полученные товары?')) {
+                completedTasks = [];
+                render();
+            }
         }
 
         async function init() {
@@ -418,20 +542,20 @@
             await loadItemsFromUrl(DEFAULT_URL);
 
             addTaskBtn.addEventListener('click', () => {
-                addTask(taskNameInput.value, taskPointsInput.value);
+                addTask(taskNameInput.value, taskPointsSelect.value);
                 taskNameInput.value = '';
-                taskPointsInput.value = '10';
                 taskNameInput.focus();
             });
 
             taskNameInput.addEventListener('keypress', e => { if (e.key === 'Enter') addTaskBtn.click(); });
-            taskPointsInput.addEventListener('keypress', e => { if (e.key === 'Enter') addTaskBtn.click(); });
 
             exportBtn.addEventListener('click', exportItems);
             
             reloadBtn.addEventListener('click', async () => {
                 await loadItemsFromUrl(itemsUrl);
             });
+
+            clearCompletedBtn.addEventListener('click', clearCompleted);
 
             applyUrlBtn.addEventListener('click', () => {
                 const url = itemsUrlInput.value.trim();
@@ -444,15 +568,37 @@
                 }
             });
 
+            // Делегирование для кнопок в списках
             taskListContainer.addEventListener('click', (e) => {
                 const btn = e.target.closest('button');
                 if (!btn) return;
                 const id = btn.dataset.id;
                 if (!id) return;
 
+                if (btn.classList.contains('btn-complete')) {
+                    completeTask(id);
+                    return;
+                }
                 if (btn.classList.contains('btn-del')) {
-                    const task = tasks.find(t => t.id === id);
-                    if (task && confirm(`Удалить "${task.name}"?`)) removeTask(id);
+                    const task = activeTasks.find(t => t.id === id);
+                    if (task && confirm(`Удалить "${task.name}"?`)) removeActiveTask(id);
+                    return;
+                }
+            });
+
+            completedListContainer.addEventListener('click', (e) => {
+                const btn = e.target.closest('button');
+                if (!btn) return;
+                const id = btn.dataset.id;
+                if (!id) return;
+
+                if (btn.classList.contains('btn-undo')) {
+                    undoTask(id);
+                    return;
+                }
+                if (btn.classList.contains('btn-del-completed')) {
+                    const task = completedTasks.find(t => t.id === id);
+                    if (task && confirm(`Удалить "${task.name}" из полученных?`)) removeCompletedTask(id);
                     return;
                 }
             });
